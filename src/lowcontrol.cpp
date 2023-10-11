@@ -39,20 +39,24 @@ public:
 
 		std::cout << " Goal Update: "<< msg.pose.position.x << endl;
 		std::cout << " Goal Update: "<< msg.pose.position.y << endl;
-	//	upadte the goal
+	//	update the goal
 	}
 
 	void positionCb(const nav_msgs::Odometry& msg) {
 
-		
-		float ex = msg.pose.pose.position.x - Goal.pose.position.x;
-		float ey = msg.pose.pose.position.y - Goal.pose.position.y;
+		// Distance to objetive
+		float ex = Goal.pose.position.x - msg.pose.pose.position.x;
+		float ey = Goal.pose.position.y - msg.pose.pose.position.y;
 		float rho = sqrt(ex*ex+ey*ey);
-		float beta = atan2(ey,ex) + M_PI;
-		if (beta < -M_PI) beta = 2*M_PI - abs(beta);
-		if (beta > M_PI) beta = -2*M_PI + beta;
-		float alpha = beta - tf::getYaw(msg.pose.pose.orientation);
 		
+		// Bearing angle
+		float alpha = -tf::getYaw(msg.pose.pose.orientation) + atan2(ey,ex);
+		alpha = atan2(sin(alpha),cos(alpha));
+		
+		// Relative orientation
+		float beta = -tf::getYaw(msg.pose.pose.orientation) - alpha;
+		beta = atan2(sin(beta),cos(beta));
+			
 		std::cout << "ex: "<< ex << " ";
 		std::cout << "ey: "<< ey << " ";
 
